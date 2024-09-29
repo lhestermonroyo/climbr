@@ -7,9 +7,14 @@ import { generateToken } from '../utils/auth.util';
 class UserController {
   async getUsers(req: any, res: any) {
     try {
-      const users = await UserService.getAllUsers();
+      const users: any = await UserService.getAllUsers();
+      const formattedUsers = users.map((user: any) => {
+        delete user.password;
 
-      return res.status(200).json(users);
+        return user;
+      });
+
+      return res.status(200).json(formattedUsers);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -17,7 +22,7 @@ class UserController {
 
   async getProfile(req: any, res: any) {
     try {
-      const { username } = req.params;
+      const { username } = req.user;
 
       const user = await UserService.getUser({ username });
       delete user.password;
@@ -37,13 +42,23 @@ class UserController {
       }
 
       const user = req.body;
-      const newUser = await UserService.createUser({
+
+      if (user.password !== user.confirmPassword) {
+        return res.status(400).json({ error: 'Passwords do not match.' });
+      }
+
+      const response = await UserService.createUser({
         ...user,
         password: bcrypt.hashSync(user.password, 10),
       });
-      delete newUser.password;
 
-      return res.status(201).json(newUser);
+      if (response) {
+        const newUser = await UserService.getUser({ username: user.username });
+        const token = generateToken(newUser);
+        delete newUser.password;
+
+        return res.status(201).json({ user: newUser, token });
+      }
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         return res
@@ -93,13 +108,17 @@ class UserController {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { username } = req.params;
+      const { username } = req.user;
       const user = req.body;
 
-      const updatedUser = await UserService.updateUser({ ...user }, username);
-      delete updatedUser.password;
+      const response = await UserService.updateUser({ ...user }, username);
 
-      return res.status(200).json(updatedUser);
+      if (response) {
+        const updatedUser = await UserService.getUser({ username });
+        delete updatedUser.password;
+
+        return res.status(200).json(updatedUser);
+      }
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }

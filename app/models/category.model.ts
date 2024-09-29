@@ -3,11 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import query from '../lib/db';
 import { formatColSet } from '../utils/common.util';
 
-class UserModel {
+class CategoryModel {
   private tableName: string;
 
   constructor() {
-    this.tableName = 'user';
+    this.tableName = 'category';
   }
 
   async findAll() {
@@ -45,22 +45,13 @@ class UserModel {
     }
   }
 
-  async create(user: any) {
+  async create(category: any) {
     try {
       const id = uuidv4();
-      const { username, email, password, fullname, location, bio, role } = user;
+      const { creator, name, description } = category;
 
-      const sql = `INSERT INTO ${this.tableName} (id, username, email, password, fullname, location, bio, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-      const values = [
-        id,
-        username,
-        email,
-        password,
-        fullname,
-        location,
-        bio,
-        role,
-      ];
+      const sql = `INSERT INTO ${this.tableName} (id, creator, name, description,) VALUES (?, ?, ?, ?)`;
+      const values = [id, creator, name, description];
 
       const { affectedRows } = (await query(sql, values)) as any;
       return affectedRows || 0;
@@ -69,18 +60,28 @@ class UserModel {
     }
   }
 
-  async update(params: any, username: string) {
+  async update(params: any, id: string) {
     try {
       const { colSet, values } = formatColSet(params);
 
-      const sql = `UPDATE ${this.tableName} SET ${colSet} WHERE username = ?`;
+      const sql = `UPDATE ${this.tableName} SET ${colSet} WHERE id = ?`;
+      const result = await query(sql, [...values, id]);
 
-      const { affectedRows } = (await query(sql, [...values, username])) as any;
-      return affectedRows || 0;
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      const sql = `DELETE FROM ${this.tableName} WHERE id = ?`;
+
+      return await query(sql, [id]);
     } catch (error) {
       throw error;
     }
   }
 }
 
-export default new UserModel();
+export default new CategoryModel();

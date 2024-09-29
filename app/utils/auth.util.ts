@@ -4,9 +4,13 @@ const SECRET_KEY = 'password';
 const EXPIRATION = '24h';
 
 export const generateToken = (user: any) => {
-  const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {
-    expiresIn: EXPIRATION,
-  });
+  const token = jwt.sign(
+    { id: user.id, username: user.username, role: user.role },
+    SECRET_KEY,
+    {
+      expiresIn: EXPIRATION,
+    }
+  );
 
   return token;
 };
