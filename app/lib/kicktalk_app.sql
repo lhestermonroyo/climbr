@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `kicktalk_app` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `kicktalk_app`;
 -- MySQL dump 10.13  Distrib 8.0.38, for macos14 (arm64)
 --
 -- Host: localhost    Database: kicktalk_app
@@ -255,14 +253,14 @@ DROP TABLE IF EXISTS `shoe`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shoe` (
   `id` varchar(255) NOT NULL,
-  `creator_id` varchar(255) DEFAULT NULL,
+  `creator` varchar(255) DEFAULT NULL,
   `brand` varchar(255) DEFAULT NULL,
   `category` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `release_date` varchar(255) DEFAULT NULL,
   `gender` varchar(255) DEFAULT NULL,
-  `created_at` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -309,7 +307,7 @@ DROP TABLE IF EXISTS `shoe_link`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shoe_link` (
   `id` varchar(255) NOT NULL,
-  `shoe_id` varchar(45) DEFAULT NULL,
+  `shoe_id` varchar(255) DEFAULT NULL,
   `link` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -353,7 +351,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('371f9dbb-c395-47f8-bcbe-f0d22d5c74e3','chandlerbing','chandler@email.com','$2a$10$K9SEJGBsTNUHRH1Ypil3j.T5NZ69T/j2QQXcNWx5p8ew0Sj3teryq','Chandler Bing','New York, USA','Could I be anymore turned on?','user','2024-09-27 14:15:26'),('bca6e935-eafe-4b0c-84d5-3428476d1c2f','admin','admin@email.com','$2a$10$h7p1Zi5XeY6sNoKMCILQ3OzoOZJu5vlZx3C8QqNOwN2h3Dbv7qKq6','Admin User','New York, USA','I am the admin here.','admin','2024-09-27 14:30:09');
+INSERT INTO `user` VALUES ('371f9dbb-c395-47f8-bcbe-f0d22d5c74e3','chandlerbing','chandler@email.com','$2a$10$K9SEJGBsTNUHRH1Ypil3j.T5NZ69T/j2QQXcNWx5p8ew0Sj3teryq','Chandler Bing','New York, USA','Could I be anymore turned on?','user','2024-09-27 14:15:26'),('bca6e935-eafe-4b0c-84d5-3428476d1c2f','admin','admin@email.com','$2a$10$h7p1Zi5XeY6sNoKMCILQ3OzoOZJu5vlZx3C8QqNOwN2h3Dbv7qKq6','Admin User','New York, USA','My new updated bio.','admin','2024-09-27 14:30:09');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -366,4 +364,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-29  8:59:30
+-- Dump completed on 2024-10-05 11:55:19

@@ -15,19 +15,16 @@ export const generateToken = (user: any) => {
   return token;
 };
 
-export const checkAuth = (req: any, res: any, next: any) => {
-  const token = req.headers['x-auth-token'];
+export const checkAuth = (ctx: any) => {
+  const token = ctx.req.headers['x-auth-token'];
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: 'Invalid token, permission denied.' });
+    throw new Error('Invalid token, permission denied.');
   }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
-    next();
+    const user = jwt.verify(token, SECRET_KEY);
+    return user;
   } catch (err) {
     throw err;
   }

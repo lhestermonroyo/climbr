@@ -1,17 +1,32 @@
-import BrandModel from '../models/brand.model';
+import { v4 as uuidv4 } from 'uuid';
+
+import query from '../lib/db';
+import { formatColSet } from '../utils/common.util';
 
 class BrandService {
+  private tableName: string;
+
+  constructor() {
+    this.tableName = 'brand';
+  }
+
   async getAllBrands() {
     try {
-      return await BrandModel.findAll();
+      const sql = `SELECT * FROM ${this.tableName} order by created_at desc`;
+
+      return (await query(sql, [])) as any;
     } catch (error) {
       throw error;
     }
   }
 
-  async getBrands(params: any) {
+  async getBrandsBy(params: any) {
     try {
-      return await BrandModel.find(params);
+      const { colSet, values } = formatColSet(params);
+
+      const sql = `SELECT * FROM ${this.tableName} WHERE ${colSet} order by created_at desc`;
+
+      return (await query(sql, [...values])) as any;
     } catch (error) {
       throw error;
     }
@@ -19,7 +34,12 @@ class BrandService {
 
   async getBrand(params: any) {
     try {
-      return await BrandModel.findOne(params);
+      const { colSet, values } = formatColSet(params);
+
+      const sql = `SELECT * FROM ${this.tableName} WHERE ${colSet}`;
+
+      const res = await query(sql, [...values]);
+      return res[0] as any;
     } catch (error) {
       throw error;
     }
@@ -27,7 +47,14 @@ class BrandService {
 
   async createBrand(brand: any) {
     try {
-      return await BrandModel.create(brand);
+      const id = uuidv4();
+      const { creator, name, description, thumbnail } = brand;
+
+      const sql = `INSERT INTO ${this.tableName} (id, creator, name, description, thumbnail) VALUES (?, ?, ?, ?, ?)`;
+      const values = [id, creator, name, description, thumbnail];
+
+      const { affectedRows } = (await query(sql, values)) as any;
+      return affectedRows || 0;
     } catch (error) {
       throw error;
     }
@@ -35,7 +62,12 @@ class BrandService {
 
   async updateBrand(params: any, id: string) {
     try {
-      return await BrandModel.update(params, id);
+      const { colSet, values } = formatColSet(params);
+
+      const sql = `UPDATE ${this.tableName} SET ${colSet} WHERE id = ?`;
+      const { affectedRows } = (await query(sql, [...values, id])) as any;
+
+      return affectedRows || 0;
     } catch (error) {
       throw error;
     }
@@ -43,7 +75,10 @@ class BrandService {
 
   async deleteBrand(id: string) {
     try {
-      return await BrandModel.delete(id);
+      const sql = `DELETE FROM ${this.tableName} WHERE id = ?`;
+      const { affectedRows } = (await query(sql, [id])) as any;
+
+      return affectedRows || 0;
     } catch (error) {
       throw error;
     }
