@@ -1,19 +1,26 @@
 import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
+import {
+  ExpressContextFunctionArgument,
+  expressMiddleware
+} from '@apollo/server/express4';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { createServer } from 'http';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
-import typeDefs from './app/graphql/typeDefs';
-import resolvers from './app/graphql/resolvers';
+import typeDefs from './graphql/typeDefs';
+import resolvers from './graphql/resolvers';
+
+import { mongoUri, port } from './config';
+import { checkAuth } from './utils/auth.util';
 
 const schema = makeExecutableSchema({
   typeDefs,
-  resolvers,
+  resolvers
 });
 
 const app = express();
@@ -21,11 +28,11 @@ const httpServer = createServer(app);
 
 const wsServer = new WebSocketServer({
   server: httpServer,
-  path: '/',
+  path: '/subscriptions'
 });
 const wsServerCleanup = useServer(
   {
-    schema,
+    schema
   },
   wsServer
 );
@@ -39,21 +46,25 @@ const apolloServer = new ApolloServer({
         return {
           async drainServer() {
             await wsServerCleanup.dispose();
-          },
+          }
         };
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
 
 (async () => {
   try {
     await apolloServer.start();
+    await mongoose.connect(mongoUri);
     app.use(
+      '/graphql',
       cors(),
       express.json(),
       expressMiddleware(apolloServer, {
-        context: async ({ req }) => ({ req }),
+        context: async (ctx: ExpressContextFunctionArgument) => {
+          return await checkAuth(ctx.req);
+        }
       })
     );
   } catch (error) {
@@ -61,7 +72,7 @@ const apolloServer = new ApolloServer({
   }
 })();
 
-httpServer.listen(3000, () => {
-  console.log(`🚀 Server running at http://localhost:${3000}`);
-  console.log(`🚀 Subscriptions ready at ws://localhost:${3000}`);
+httpServer.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}/graphql`);
+  console.log(`🚀 Subscriptions ready at ws://localhost:${port}/subscriptions`);
 });
