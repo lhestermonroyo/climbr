@@ -34,6 +34,10 @@ const organizerSchema = new Schema({
       }
     }
   ],
+  isArchived: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: String,
     default: new Date().toISOString()

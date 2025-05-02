@@ -6,7 +6,7 @@ const userSchema = new Schema({
     required: true,
     unique: true
   },
-  password: String,
+  phoneNumber: String,
   firstName: String,
   lastName: String,
   pronouns: String,
@@ -21,6 +21,10 @@ const userSchema = new Schema({
     instagram: String,
     threads: String,
     youtube: String
+  },
+  isArchived: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: String,

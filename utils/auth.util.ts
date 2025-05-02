@@ -13,19 +13,23 @@ export const checkAuth = async (req: Request) => {
     ? authHeader.split(' ')[1]
     : null;
 
-  let currentUser = null;
+  let authUser = null;
 
   if (token) {
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      currentUser = decodedToken;
+      const decodedToken = await admin.auth().verifySessionCookie(token);
+      authUser = decodedToken;
     } catch (error) {
       console.error('Firebase token verification failed:', error.message);
+      throw new AuthenticationError(
+        'Firebase token verification failed: ' + error.message
+      );
     }
   }
-
-  return { currentUser };
+  return { authUser };
 };
+
+export const setToken = async (user: any, ctx: any) => {};
 
 module.exports.checkEmail = (email) => {
   const re = /\S+@\S+\.\S+/;

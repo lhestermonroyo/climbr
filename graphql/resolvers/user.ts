@@ -1,57 +1,204 @@
-import bcrypt from 'bcryptjs';
-import { UserInputError } from 'apollo-server';
+import { UserInputError, AuthenticationError } from 'apollo-server';
 
 import User from '../../models/User';
-import { signUpSchema } from '../../middleware/validator.middleware';
-import { SessionUser, SignUpInput } from '../../types';
+import {
+  createUserSchema,
+  updateUserSchema
+} from '../../middleware/validator.middleware';
+import { ContextType, CreateUserInput, UpdateUserInput } from '../../types';
 
 export default {
   Mutation: {
-    async signUp(
+    async createUser(
       _: {},
-      { signUpInput }: { signUpInput: SignUpInput },
-      { sUser }: { sUser: SessionUser | null }
+      { createUserInput }: { createUserInput: CreateUserInput },
+      __: ContextType
     ) {
       try {
-        if (!sUser) {
-          throw new UserInputError('User not authenticated');
-        }
+        await createUserSchema.validate(createUserInput, { abortEarly: false });
 
-        if (!sUser.verified) {
-          throw new UserInputError('Email not verified');
-        }
+        const { email, firstName, lastName, avatar } = createUserInput;
 
-        await signUpSchema.validate(signUpInput, { abortEarly: false });
+        const existingUser = await User.findOne({ email, isArchived: false });
 
-        const { email, password, firstName, lastName } = signUpInput;
-
-        const user = await User.findOne({ email });
-
-        if (user) {
-          throw new Error('User already exists');
+        if (existingUser) {
+          throw new UserInputError('User already exists');
         }
 
         const newUser = new User({
           email,
-          password,
           firstName,
-          lastName
+          lastName,
+          avatar
         });
+        const response = await newUser.save();
+
+        return {
+          id: response._id,
+          ...response.toObject()
+        };
       } catch (error) {
         console.log('Error creating user:', error);
-        throw new Error('Failed to create user');
+        throw error;
+      }
+    },
+    async updateUser(
+      _: {},
+      { updateUserInput }: { updateUserInput: UpdateUserInput },
+      ctx: ContextType
+    ) {
+      try {
+        await updateUserSchema.validate(updateUserInput, { abortEarly: false });
+
+        const { authUser } = ctx;
+
+        if (!authUser) {
+          throw new AuthenticationError('Unauthorized');
+        }
+
+        const user = await User.findOne({ email: authUser.email });
+
+        if (!user) {
+          throw new UserInputError('User not found');
+        }
+
+        Object.assign(user, {
+          phoneNumber: updateUserInput.phoneNumber,
+          firstName: updateUserInput.firstName,
+          lastName: updateUserInput.lastName,
+          pronouns: updateUserInput.pronouns,
+          location: updateUserInput.location,
+          birthdate: updateUserInput.birthdate,
+          bio: updateUserInput.bio,
+          avatar: updateUserInput.avatar
+        });
+
+        if (updateUserInput.socials) {
+          user.socials = {
+            ...user.socials,
+            ...updateUserInput.socials
+          };
+        }
+
+        const updatedUser = await user.save();
+
+        return {
+          id: updatedUser._id,
+          ...updatedUser.toObject()
+        };
+      } catch (error) {
+        console.error('Error updating user:', error);
+        throw error;
+      }
+    },
+    async archiveUser(_: {}, __: {}, ctx: ContextType) {
+      try {
+        const { authUser } = ctx;
+
+        if (!authUser) {
+          throw new UserInputError('Unauthorized');
+        }
+
+        const user = await User.findOne({
+          email: authUser.email
+        });
+
+        if (!user) {
+          throw new UserInputError('User not found');
+        }
+
+        if (user.isArchived) {
+          throw new UserInputError('User is already archived');
+        }
+
+        user.isArchived = true;
+        await user.save();
+
+        return {
+          id: user._id,
+          ...user.toObject()
+        };
+      } catch (error) {
+        console.error('Error archiving user:', error);
+        throw error;
+      }
+    },
+    async unarchiveUser(_: {}, __: {}, ctx: ContextType) {
+      try {
+        const { authUser } = ctx;
+
+        if (!authUser) {
+          throw new UserInputError('Unauthorized');
+        }
+
+        const user = await User.findOne({
+          email: authUser.email
+        });
+
+        if (!user) {
+          throw new UserInputError('User not found');
+        }
+
+        if (!user.isArchived) {
+          throw new UserInputError('User is not archived');
+        }
+
+        user.isArchived = false;
+        await user.save();
+
+        return {
+          id: user._id,
+          ...user.toObject()
+        };
+      } catch (error) {
+        console.error('Error unarchiving user:', error);
+        throw error;
       }
     }
   },
   Query: {
-    getUsers: async (_: any, __: any, ctx: any) => {
+    getProfile: async (_: {}, __: {}, ctx: ContextType) => {
       try {
-        // const result = await User.
-        // const users = result.rows;
-        // return users;
+        const { authUser } = ctx;
+
+        if (!authUser) {
+          throw new UserInputError('Unauthorized');
+        }
+
+        const user = await User.findOne({ email: authUser.email });
+
+        if (!user) {
+          throw new UserInputError('User not found');
+        }
+
+        return {
+          id: user._id,
+          ...user.toObject()
+        };
       } catch (error) {
-        console.error('Error fetching users:', error);
-        throw new Error('Failed to fetch users');
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
+    },
+    getUserById: async (_: {}, { id }: { id: string }, ctx: ContextType) => {
+      try {
+        const { authUser } = ctx;
+
+        if (!authUser) {
+          throw new UserInputError('Unauthorized');
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+          throw new UserInputError('User not found');
+        }
+        return {
+          id: user._id,
+          ...user.toObject()
+        };
+      } catch (error) {
+        console.error('Error fetching user by ID:', error);
+        throw error;
       }
     }
   }

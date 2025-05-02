@@ -62,9 +62,10 @@ const apolloServer = new ApolloServer({
       cors(),
       express.json(),
       expressMiddleware(apolloServer, {
-        context: async (ctx: ExpressContextFunctionArgument) => {
-          return await checkAuth(ctx.req);
-        }
+        context: async (ctx: ExpressContextFunctionArgument) => ({
+          ...ctx,
+          ...(await checkAuth(ctx.req))
+        })
       })
     );
   } catch (error) {
