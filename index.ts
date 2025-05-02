@@ -15,8 +15,8 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 
+import { checkAuth } from './middleware/auth.middleware';
 import { mongoUri, port } from './config';
-import { checkAuth } from './utils/auth.util';
 
 const schema = makeExecutableSchema({
   typeDefs,
