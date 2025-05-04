@@ -18,11 +18,6 @@ const eventSchema = new Schema({
   },
   price: Number,
   itinerary: String,
-  status: {
-    type: String,
-    enum: ['active', 'cancelled'],
-    default: 'active'
-  },
   thumbnail: String,
   photos: [String],
   joiners: [
@@ -46,6 +41,11 @@ const eventSchema = new Schema({
       }
     }
   ],
+  status: {
+    type: String,
+    enum: ['active', 'cancelled'],
+    default: 'active'
+  },
   createdAt: {
     type: String,
     default: new Date().toISOString()

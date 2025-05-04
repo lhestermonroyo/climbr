@@ -58,7 +58,10 @@ export default {
     },
     async updateOrganizer(
       _: {},
-      { id, organizerInput }: { id: string; organizerInput: OrganizerInput },
+      {
+        orgId,
+        organizerInput
+      }: { orgId: string; organizerInput: OrganizerInput },
       ctx: ContextType
     ) {
       try {
@@ -75,14 +78,14 @@ export default {
         const { name, description, logo, cover, phone, email, socials } =
           organizerInput;
 
-        const organizer = await Organizer.findById(id);
+        const organizer = await Organizer.findById(orgId);
 
         if (!organizer) {
           throw new Error('Organizer not found');
         }
 
         const updatedOrganizer = await Organizer.findByIdAndUpdate(
-          id,
+          orgId,
           {
             name,
             description,
@@ -105,7 +108,11 @@ export default {
         throw error;
       }
     },
-    async archiveOrganizer(_: {}, { id }: { id: string }, ctx: ContextType) {
+    async archiveOrganizer(
+      _: {},
+      { orgId }: { orgId: string },
+      ctx: ContextType
+    ) {
       try {
         const { authUser } = ctx;
 
@@ -113,7 +120,7 @@ export default {
           throw new Error('Unauthorized');
         }
 
-        const organizer = await Organizer.findById(id);
+        const organizer = await Organizer.findById(orgId);
 
         if (!organizer) {
           throw new Error('Organizer not found');
@@ -143,7 +150,11 @@ export default {
         throw error;
       }
     },
-    async unarchiveOrganizer(_: {}, { id }: { id: string }, ctx: ContextType) {
+    async unarchiveOrganizer(
+      _: {},
+      { orgId }: { orgId: string },
+      ctx: ContextType
+    ) {
       try {
         const { authUser } = ctx;
 
@@ -151,7 +162,7 @@ export default {
           throw new Error('Unauthorized');
         }
 
-        const organizer = await Organizer.findById(id);
+        const organizer = await Organizer.findById(orgId);
 
         if (!organizer) {
           throw new Error('Organizer not found');
@@ -183,7 +194,11 @@ export default {
     },
     async addMember(
       _: {},
-      { id, userId, role }: { id: string; userId: string; role: RoleType },
+      {
+        orgId,
+        userId,
+        role
+      }: { orgId: string; userId: string; role: RoleType },
       ctx: ContextType
     ) {
       try {
@@ -193,7 +208,7 @@ export default {
           throw new Error('Unauthorized');
         }
 
-        const organizer = await Organizer.findById(id);
+        const organizer = await Organizer.findById(orgId);
 
         if (!organizer) {
           throw new Error('Organizer not found');
@@ -222,10 +237,10 @@ export default {
     async updateMemberRole(
       _: {},
       {
-        id,
+        orgId,
         userId,
         role
-      }: { id: string; userId: string; role: RoleType },
+      }: { orgId: string; userId: string; role: RoleType },
       ctx: ContextType
     ) {
       try {
@@ -234,7 +249,7 @@ export default {
         if (!authUser) {
           throw new Error('Unauthorized');
         }
-        const organizer = await Organizer.findById(id);
+        const organizer = await Organizer.findById(orgId);
 
         if (!organizer) {
           throw new Error('Organizer not found');
@@ -262,7 +277,7 @@ export default {
     },
     async removeMember(
       _: {},
-      { id, userId }: { id: string; userId: string },
+      { orgId, userId }: { orgId: string; userId: string },
       ctx: ContextType
     ) {
       try {
@@ -272,7 +287,7 @@ export default {
           throw new Error('Unauthorized');
         }
 
-        const organizer = await Organizer.findById(id);
+        const organizer = await Organizer.findById(orgId);
 
         if (!organizer) {
           throw new Error('Organizer not found');
@@ -327,7 +342,11 @@ export default {
         throw error;
       }
     },
-    async getOrganizerById(_: {}, { id }: { id: string }, ctx: ContextType) {
+    async getOrganizerById(
+      _: {},
+      { orgId }: { orgId: string },
+      ctx: ContextType
+    ) {
       try {
         const { authUser } = ctx;
 
@@ -335,7 +354,7 @@ export default {
           throw new Error('Unauthorized');
         }
 
-        const organizer = await Organizer.findById(id).populate(
+        const organizer = await Organizer.findById(orgId).populate(
           populateOrganizer
         );
 

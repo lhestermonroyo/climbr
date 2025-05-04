@@ -31,7 +31,7 @@ export type UserType = {
 
 export type SessionUser = Pick<
   UserType,
-  'email' | 'firstName' | 'lastName' | 'avatar'
+  'id' | 'email' | 'firstName' | 'lastName' | 'avatar'
 >;
 
 export type CreateUserInput = Pick<
@@ -73,7 +73,56 @@ export type OrganizerType = {
 
 export type RoleType = 'admin' | 'editor';
 
+export type OrganizerMainInfo = Pick<
+  OrganizerType,
+  'id' | 'name' | 'logo' | 'createdAt'
+>;
+
 export type OrganizerInput = Omit<
   OrganizerType,
   'id' | 'members' | 'createdAt'
 >;
+
+// Event Types
+export type EventType = {
+  id: string;
+  organizer: OrganizerMainInfo;
+  title: string;
+  description: string;
+  location: string;
+  difficultyLevel: string | null;
+  trailLengthKm: number | null;
+  elevationGainM: number | null;
+  maxParticipants: number | null;
+  dates: {
+    start: string;
+    end: string;
+  };
+  price: number | null;
+  itinerary: string | null;
+  thumbnail: string | null;
+  photos: string[] | null;
+  joiners: EventJoiner[];
+  status: EventStatus;
+  createdAt: string;
+};
+
+export type EventJoiner = {
+  user: SessionUser;
+  paid: boolean;
+  status: JoinerStatus;
+  joinedAt: string;
+};
+
+export type EventStatus = 'active' | 'cancelled';
+
+export type JoinerStatus = 'pending' | 'accepted' | 'rejected';
+
+export type EventInput = Omit<
+  EventType,
+  'id' | 'organizer' | 'status' | 'joiners' | 'createdAt'
+>;
+
+export type JoinerInput = Omit<EventJoiner, 'user' | 'joinedAt'> & {
+  user: string;
+};

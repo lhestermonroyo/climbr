@@ -180,7 +180,11 @@ export default {
         throw error;
       }
     },
-    getUserById: async (_: {}, { id }: { id: string }, ctx: ContextType) => {
+    getUserById: async (
+      _: {},
+      { userId }: { userId: string },
+      ctx: ContextType
+    ) => {
       try {
         const { authUser } = ctx;
 
@@ -188,7 +192,7 @@ export default {
           throw new UserInputError('Unauthorized');
         }
 
-        const user = await User.findById(id);
+        const user = await User.findById(userId);
         if (!user) {
           throw new UserInputError('User not found');
         }

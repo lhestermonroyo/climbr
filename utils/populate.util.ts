@@ -1,4 +1,5 @@
 const sessionUserProj = '_id email firstName lastName avatar';
+const organizerProj = '_id name logo createdAt';
 
 const populateOrganizer = [
   {
@@ -7,4 +8,11 @@ const populateOrganizer = [
   }
 ];
 
-export { populateOrganizer };
+const populateEvent = [
+  {
+    path: 'organizer',
+    select: organizerProj
+  }
+];
+
+export { populateOrganizer, populateEvent };

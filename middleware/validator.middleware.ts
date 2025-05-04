@@ -48,3 +48,24 @@ export const organizerSchema = object({
     youtube: string().nullable()
   }).required()
 });
+
+// Event schema
+export const eventSchema = object({
+  title: string().required(),
+  description: string().required(),
+  location: string().required(),
+  difficultyLevel: string().nullable(),
+  trailLengthKm: string().nullable(),
+  elevationGainM: string().nullable(),
+  maxParticipants: string().nullable(),
+  dates: object({
+    start: string().required(),
+    end: string().required()
+  }).required(),
+  price: string().nullable(),
+  itinerary: string().nullable(),
+  thumbnail: string().nullable(),
+  photos: object({
+    url: string().url().required()
+  }).required()
+});

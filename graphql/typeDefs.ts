@@ -102,19 +102,19 @@ export default gql`
     unarchiveUser: User!
     # Organizer
     createOrganizer(organizerInput: OrganizerInput): Organizer!
-    updateOrganizer(id: ID!, organizerInput: OrganizerInput): Organizer!
-    archiveOrganizer(id: ID!): Organizer!
-    unarchiveOrganizer(id: ID!): Organizer!
-    addMember(id: ID!, userId: ID!, role: Role): Organizer!
-    updateMemberRole(id: ID!, userId: ID!, role: Role!): Organizer!
-    removeMember(id: ID!, userId: ID!): Organizer!
+    updateOrganizer(orgId: ID!, organizerInput: OrganizerInput): Organizer!
+    archiveOrganizer(orgId: ID!): Organizer!
+    unarchiveOrganizer(orgId: ID!): Organizer!
+    addMember(orgId: ID!, userId: ID!, role: Role): Organizer!
+    updateMemberRole(orgId: ID!, userId: ID!, role: Role!): Organizer!
+    removeMember(orgId: ID!, userId: ID!): Organizer!
   }
   type Query {
     # User
     getProfile: User!
-    getUserById(id: ID!): User!
+    getUserById(userId: ID!): User!
     # Organizer
-    getOrganizersByUser(id: ID!): [Organizer!]!
-    getOrganizerById(id: ID!): Organizer!
+    getOrganizersByUser(userId: ID!): [Organizer!]!
+    getOrganizerById(orgId: ID!): Organizer!
   }
 `;
