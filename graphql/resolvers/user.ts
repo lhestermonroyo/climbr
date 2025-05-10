@@ -91,7 +91,15 @@ export default {
         throw error;
       }
     },
-    async archiveUser(_: {}, __: {}, ctx: ContextType) {
+    async setUserArchiveStatus(
+      _: {},
+      {
+        isArchived
+      }: {
+        isArchived: boolean;
+      },
+      ctx: ContextType
+    ) {
       try {
         const { authUser } = ctx;
 
@@ -111,7 +119,7 @@ export default {
           throw new UserInputError('User is already archived');
         }
 
-        user.isArchived = true;
+        user.isArchived = isArchived;
         await user.save();
 
         return {
@@ -120,38 +128,6 @@ export default {
         };
       } catch (error) {
         console.error('Error archiving user:', error);
-        throw error;
-      }
-    },
-    async unarchiveUser(_: {}, __: {}, ctx: ContextType) {
-      try {
-        const { authUser } = ctx;
-
-        if (!authUser) {
-          throw new UserInputError('Unauthorized');
-        }
-
-        const user = await User.findOne({
-          email: authUser.email
-        });
-
-        if (!user) {
-          throw new UserInputError('User not found');
-        }
-
-        if (!user.isArchived) {
-          throw new UserInputError('User is not archived');
-        }
-
-        user.isArchived = false;
-        await user.save();
-
-        return {
-          id: user._id,
-          ...user.toObject()
-        };
-      } catch (error) {
-        console.error('Error unarchiving user:', error);
         throw error;
       }
     }

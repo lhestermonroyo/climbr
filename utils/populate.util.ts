@@ -12,6 +12,10 @@ const populateEvent = [
   {
     path: 'organizer',
     select: organizerProj
+  },
+  {
+    path: 'joiners.user',
+    select: sessionUserProj
   }
 ];
 

@@ -32,8 +32,8 @@ const eventSchema = new Schema({
       },
       status: {
         type: String,
-        enum: ['pending', 'accepted', 'rejected'],
-        default: 'pending'
+        enum: ['active', 'cancelled'],
+        default: 'active'
       },
       joinedAt: {
         type: String,
@@ -45,6 +45,10 @@ const eventSchema = new Schema({
     type: String,
     enum: ['active', 'cancelled'],
     default: 'active'
+  },
+  isArchived: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: String,

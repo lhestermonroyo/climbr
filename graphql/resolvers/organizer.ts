@@ -108,9 +108,9 @@ export default {
         throw error;
       }
     },
-    async archiveOrganizer(
+    async setOrganizerArchiveStatus(
       _: {},
-      { orgId }: { orgId: string },
+      { orgId, isArchived }: { orgId: string; isArchived: boolean },
       ctx: ContextType
     ) {
       try {
@@ -138,49 +138,7 @@ export default {
           );
         }
 
-        organizer.isArchived = true;
-        await organizer.save();
-        await organizer.populate(populateOrganizer);
-
-        return {
-          id: organizer._id,
-          ...organizer.toObject()
-        };
-      } catch (error) {
-        throw error;
-      }
-    },
-    async unarchiveOrganizer(
-      _: {},
-      { orgId }: { orgId: string },
-      ctx: ContextType
-    ) {
-      try {
-        const { authUser } = ctx;
-
-        if (!authUser) {
-          throw new Error('Unauthorized');
-        }
-
-        const organizer = await Organizer.findById(orgId);
-
-        if (!organizer) {
-          throw new Error('Organizer not found');
-        }
-
-        const isAdmin = organizer.members.some(
-          (member) =>
-            member.user.toString() === authUser._id.toString() &&
-            member.role === 'admin'
-        );
-
-        if (!isAdmin) {
-          throw new Error(
-            'Unauthorized: Only admins can unarchive the organizer'
-          );
-        }
-
-        organizer.isArchived = false;
+        organizer.isArchived = isArchived;
         await organizer.save();
         await organizer.populate(populateOrganizer);
 

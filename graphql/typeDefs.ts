@@ -6,6 +6,10 @@ export default gql`
     admin
     member
   }
+  enum EventStatus {
+    active
+    cancelled
+  }
   # User
   type SessionUser {
     id: ID!
@@ -65,6 +69,12 @@ export default gql`
   }
 
   # Organizer
+  type OrganizerMainInfo {
+    id: ID!
+    name: String!
+    logo: String
+    createdAt: String
+  }
   type Organizer {
     id: ID!
     name: String!
@@ -93,21 +103,78 @@ export default gql`
     socials: SocialsInput!
   }
 
+  # Event
+  type Event {
+    id: ID!
+    organizer: OrganizerMainInfo!
+    title: String!
+    description: String!
+    location: String!
+    difficultyLevel: String
+    trailLengthKm: Float
+    elevationGainM: Float
+    maxParticipants: Int
+    dates: EventDates!
+    price: Float
+    itinerary: String
+    thumbnail: String
+    photos: [String]
+    joiners: [Joiner!]!
+    status: String!
+    isArchived: Boolean!
+    createdAt: String!
+  }
+  type EventDates {
+    start: String!
+    end: String!
+  }
+  type Joiner {
+    user: SessionUser!
+    paid: Boolean!
+    status: EventStatus!
+    joinedAt: String!
+  }
+  input EventInput {
+    title: String!
+    description: String!
+    location: String!
+    difficultyLevel: String
+    trailLengthKm: Float
+    elevationGainM: Float
+    maxParticipants: Int
+    dates: EventDatesInput!
+    price: Float
+    itinerary: String
+    thumbnail: String
+    photos: [String]
+  }
+  input EventDatesInput {
+    start: String!
+    end: String!
+  }
+
   # Query and Mutation
   type Mutation {
     # User
     createUser(createUserInput: CreateUserInput): User!
     updateUser(updateUserInput: UpdateUserInput): User!
-    archiveUser: User!
-    unarchiveUser: User!
+    setUserArchiveStatus(isArchived: Boolean): User!
     # Organizer
     createOrganizer(organizerInput: OrganizerInput): Organizer!
     updateOrganizer(orgId: ID!, organizerInput: OrganizerInput): Organizer!
-    archiveOrganizer(orgId: ID!): Organizer!
-    unarchiveOrganizer(orgId: ID!): Organizer!
+    setOrganizerArchiveStatus(orgId: ID!, isArchived: Boolean): Organizer!
     addMember(orgId: ID!, userId: ID!, role: Role): Organizer!
     updateMemberRole(orgId: ID!, userId: ID!, role: Role!): Organizer!
     removeMember(orgId: ID!, userId: ID!): Organizer!
+    # Event
+    createEvent(orgId: ID!, eventInput: EventInput): Event!
+    updateEvent(eventId: ID!, eventInput: EventInput): Event!
+    cancelEvent(eventId: ID!): Event!
+    setEventArchiveStatus(eventId: ID!, isArchived: Boolean): Event!
+    addJoiners(eventId: ID!, userIds: [ID!]!): Event!
+    removeJoiners(eventId: ID!, userIds: [ID!]!): Event!
+    updateJoinerStatus(eventId: ID!, userId: ID!, status: EventStatus!): Event!
+    updateJoinerPayment(eventId: ID!, userId: ID!, paid: Boolean!): Event!
   }
   type Query {
     # User
@@ -116,5 +183,9 @@ export default gql`
     # Organizer
     getOrganizersByUser(userId: ID!): [Organizer!]!
     getOrganizerById(orgId: ID!): Organizer!
+    # Event
+    getEventsByOrganizer(orgId: ID!): [Event!]!
+    getEventsByUser(userId: ID!): [Event!]!
+    getEventById(eventId: ID!): Event!
   }
 `;

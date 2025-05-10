@@ -102,27 +102,22 @@ export type EventType = {
   itinerary: string | null;
   thumbnail: string | null;
   photos: string[] | null;
-  joiners: EventJoiner[];
+  joiners: Joiner[];
   status: EventStatus;
+  isArchived: boolean;
   createdAt: string;
 };
 
-export type EventJoiner = {
+export type Joiner = {
   user: SessionUser;
   paid: boolean;
-  status: JoinerStatus;
+  status: EventStatus;
   joinedAt: string;
 };
 
 export type EventStatus = 'active' | 'cancelled';
 
-export type JoinerStatus = 'pending' | 'accepted' | 'rejected';
-
 export type EventInput = Omit<
   EventType,
   'id' | 'organizer' | 'status' | 'joiners' | 'createdAt'
 >;
-
-export type JoinerInput = Omit<EventJoiner, 'user' | 'joinedAt'> & {
-  user: string;
-};
