@@ -39,10 +39,7 @@ export type CreateUserInput = Pick<
   'email' | 'firstName' | 'lastName' | 'avatar'
 >;
 
-export type UpdateUserInput = Omit<
-  UserType,
-  'id' | 'createdAt' | 'email' | 'isArchived'
->;
+export type UpdateUserInput = Partial<UserType>;
 
 // Organizer Types
 export type OrganizerType = {
@@ -61,14 +58,14 @@ export type OrganizerType = {
     threads: string | null;
     youtube: string | null;
   };
-  members: {
-    user: SessionUser & {
-      id: string;
-    };
-    role: RoleType;
-  }[];
+  members: MemberType[];
   isArchived: boolean;
   createdAt: string;
+};
+
+export type MemberType = {
+  user: SessionUser;
+  role: RoleType;
 };
 
 export type RoleType = 'admin' | 'editor';
@@ -80,7 +77,7 @@ export type OrganizerMainInfo = Pick<
 
 export type OrganizerInput = Omit<
   OrganizerType,
-  'id' | 'members' | 'createdAt'
+  'id' | 'members' | 'isArchived' | 'createdAt'
 >;
 
 // Event Types
@@ -117,7 +114,33 @@ export type Joiner = {
 
 export type EventStatus = 'active' | 'cancelled';
 
+export type EventMainInfo = Pick<
+  EventType,
+  'id' | 'organizer' | 'title' | 'thumbnail' | 'dates' | 'status' | 'createdAt'
+>;
+
 export type EventInput = Omit<
   EventType,
   'id' | 'organizer' | 'status' | 'joiners' | 'createdAt'
 >;
+
+// Chat Room Types
+export type ChatRoomType = {
+  id: string;
+  event: EventMainInfo;
+  joiners: SessionUser[];
+  messages: MessageType[];
+  isArchived: boolean;
+  createdAt: string;
+};
+
+export type MessageType = {
+  id: string;
+  sender: SessionUser;
+  content: string;
+  files: string[] | null;
+  readBy: SessionUser[];
+  sentAt: string;
+};
+
+export type MessageInput = Pick<MessageType, 'content' | 'files'>;

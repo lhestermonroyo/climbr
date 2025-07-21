@@ -29,25 +29,11 @@ export const checkAuth = async (req: Request) => {
   return { authUser };
 };
 
-export const setToken = async (user: any, ctx: any) => {};
-
-module.exports.checkEmail = (email) => {
+module.exports.checkEmail = (email: string) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 };
 
-module.exports.setGoogleToken = async (idToken, userId, ctx) => {
-  const sessionCookie = await admin
-    .auth()
-    .createSessionCookie(idToken, { expiresIn });
-
-  await ctx.res.cookie('GOOGLE_ID_TOKEN', sessionCookie, {
-    httpOnly: true,
-    sameSite: 'Strict',
-    maxAge: expiresIn
-  });
-  await ctx.res.cookie('USER_ID', userId);
-};
 
 module.exports.genAndStoreToken = async (user, ctx) => {
   const token = jwt.sign(

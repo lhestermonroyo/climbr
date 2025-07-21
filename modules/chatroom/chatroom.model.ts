@@ -1,6 +1,11 @@
 const { model, Schema } = require('mongoose');
 
 const chatRoomSchema = new Schema({
+  type: {
+    type: String,
+    enum: ['group', 'private'],
+    required: true
+  },
   event: {
     type: Schema.Types.ObjectId,
     ref: 'Event',
@@ -8,10 +13,11 @@ const chatRoomSchema = new Schema({
       return this.type === 'group';
     }
   },
-  joiners: [
+  participants: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
+      required: true
     }
   ],
   messages: [
@@ -35,16 +41,19 @@ const chatRoomSchema = new Schema({
           ref: 'User'
         }
       ],
-      createdAt: {
+      sentAt: {
         type: String,
         default: new Date().toISOString()
       }
     }
   ],
-  status: {
+  isArchived: {
+    type: Boolean,
+    default: false
+  },
+  createdAt: {
     type: String,
-    enum: ['active', 'archived'],
-    default: 'active'
+    default: new Date().toISOString()
   }
 });
 

@@ -12,8 +12,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
-import typeDefs from './graphql/typeDefs';
-import resolvers from './graphql/resolvers';
+import { typeDefs, resolvers } from './schema';
 
 import { checkAuth } from './middleware/auth.middleware';
 import { mongoUri, port } from './config';

@@ -19,4 +19,11 @@ const populateEvent = [
   }
 ];
 
-export { populateOrganizer, populateEvent };
+const populateChatRoom = [
+  {
+    path: 'joiners.user',
+    select: sessionUserProj
+  }
+];
+
+export { populateOrganizer, populateEvent, populateChatRoom };

@@ -1,4 +1,4 @@
-import { object, string } from 'yup';
+import { array, object, string } from 'yup';
 
 // User schema
 export const createUserSchema = object({
@@ -8,9 +8,8 @@ export const createUserSchema = object({
 });
 
 export const updateUserSchema = object({
-  phoneNumber: string().nullable(),
-  firstName: string().required(),
-  lastName: string().required(),
+  firstName: string(),
+  lastName: string(),
   pronouns: string().nullable(),
   location: string().nullable(),
   birthdate: string().nullable(),
@@ -65,7 +64,10 @@ export const eventSchema = object({
   price: string().nullable(),
   itinerary: string().nullable(),
   thumbnail: string().nullable(),
-  photos: object({
-    url: string().url().required()
-  }).required()
+  photos: array().of(string().url()).nullable().required()
+});
+
+export const messageSchema = object({
+  content: string().required(),
+  files: array().of(string().url()).nullable()
 });
